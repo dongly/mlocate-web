@@ -7,10 +7,27 @@ from subprocess import Popen, PIPE
 from flask import send_from_directory
 from socket import gethostname
 from pipes import quote
+import glob, os
 
-MAX_RESULT_BYTES = 1000000  # set to -1 to disable limit
+MAX_RESULT_BYTES = os.getenv('MAX_RESULT_BYTES', 1000000)  # set to -1 to disable limit
+MAX_DATABASES = os.getenv('MAX_DATABASES', 5)
+APP_ROUTE = os.getenv('APP_ROUTE', '/')
+if not APP_ROUTE.startswith('/'):
+    APP_ROUTE = '/' + APP_ROUTE
+if not APP_ROUTE.endswith('/'):
+    APP_ROUTE = APP_ROUTE + '/'
 
 app = flask.Flask(__name__)
+
+databases = glob.glob('/app/databases/*.db')
+databases = databases[:MAX_DATABASES]
+
+databaselist = {}
+for database in databases:
+    name = os.path.basename(database)
+    databaselist[name] = {}
+    databaselist[name]['label'] = os.path.basename(database)[:-3].title()
+    databaselist[name]['checked'] = 'checked'
 
 def getitem(obj, item, default):
     if item not in obj:
@@ -18,26 +35,36 @@ def getitem(obj, item, default):
     else:
         return obj[item]
 
-@app.route('/')
+@app.route(APP_ROUTE)
 def main():
-  return flask.redirect('/index')
+  return flask.redirect(APP_ROUTE + 'index')
 
-@app.route('/index')
+@app.route(APP_ROUTE + 'index')
 def index():
     # handle user args
     args = flask.request.args
     query = getitem(args, 'searchbox', '')
-    cs = getitem(args, 'caseSensitive', '')
+    if getitem(args, 'caseSensitive', '') == "on":
+        cs = "checked"
+    else:
+        cs = "unchecked"
+    dbsearch = ""
+    for database in databaselist.keys():
+        if getitem(args, database, '') == "on":
+            databaselist[database]['checked'] = 'checked'
+            dbsearch = dbsearch + ' -d ' + quote('/app/databases/' + database)
+        else:
+            databaselist[database]['checked'] = 'unchecked'
     hostname = gethostname()
     if query == '':
         resultslist = ''
         results_truncated = False
     else:
-        if cs != 'on':
-            cs = "-i "
+        if cs != 'checked':
+            cs = " -i "
         else:
             cs = ""
-        command = 'mlocate ' + cs + quote(query)
+        command = 'mlocate ' + dbsearch + cs + quote(query)
         command = command.encode('utf-8')
         with Popen(command, shell=True, stdout=PIPE) as proc:
             outs = proc.stdout.read(MAX_RESULT_BYTES)
@@ -51,12 +78,15 @@ def index():
 
     html = flask.render_template(
         'index.html',
+        searchbox=query,
+        cs=cs,
+        databaselist=databaselist,
         results_truncated=results_truncated,
         resultslist=resultslist,
         hostname=hostname)
     return html
 
-@app.route('/css/<path:path>')
+@app.route(APP_ROUTE + 'css/<path:path>')
 def send_css(path):
     return send_from_directory('css', path)
 

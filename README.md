@@ -1,5 +1,5 @@
 # mlocate-web
-A very simple Python web application that offers a web interface for searching a system's filesystem by name using locate / mlocate. 
+A very simple Python web application that offers a web interface for searching a system's filesystem by name using locate / mlocate.
 
 ## Requirements:
 * Python3 (developed using 3.5.2)
@@ -11,6 +11,16 @@ A very simple Python web application that offers a web interface for searching a
 * cd to directory
 * `python3 app.py`
 * **For detailed instructions, with autostart and using gunicorn to serve the webapp, see below screenshot**
+
+### Docker
+`docker-compose build && docker-compose up -d`
+
+#### Environment Variables
+
+* MAX_RESULT_BYTES - [1000000] Maximum size of search results measured in bytes
+* MAX_DATABASES - [5] Maximum allowed databases to be displayed
+* APP_ROUTE - Directory app is hosted.
+
 
 ## Screenshot
 

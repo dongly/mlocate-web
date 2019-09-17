@@ -1,0 +1,12 @@
+version: '2'
+services:
+  mlocate-web:
+    container_name: mlocate-web
+    build: .
+    ports:
+      - "127.0.0.1:8099:80"
+    environment:
+      - MODULE_NAME="app"
+      - APP_SUBDIR=mlocate
+    volumes:
+      - ./databases:/app/databases

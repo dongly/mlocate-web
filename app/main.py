@@ -46,17 +46,17 @@ def main():
 
 @app.route(APP_ROUTE + 'index')
 def index():
-    # check query
+    # handle user args
     args = flask.request.args
     query = getitem(args, 'searchbox', '')
+    excludebox = getitem(args, 'excludebox', '')
+    includebox = getitem(args, 'includebox', '')
+    cs = getitem(args, 'caseSensitive', '')
+    bn = getitem(args, 'basename', '')
     if query == '':
         resultslist = '<div class="alert alert-info" role="alert">Please Enter a search Query</div>'
         results_truncated = False
     else:
-        excludebox = getitem(args, 'excludebox', '')
-        includebox = getitem(args, 'includebox', '')
-        cs = getitem(args, 'caseSensitive', '')
-        bn = getitem(args, 'basename', '')
         dbsearch = ''
         for database in databaselist.keys():
             if getitem(args, database, '') == 'on':

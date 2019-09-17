@@ -6,6 +6,6 @@ services:
     ports:
       - "127.0.0.1:8099:80"
     environment:
-      - APP_SUBDIR=mlocate
+      - APP_ROUTE=mlocate
     volumes:
       - ./databases:/app/databases

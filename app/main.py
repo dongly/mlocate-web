@@ -46,13 +46,13 @@ def main():
 
 @app.route(APP_ROUTE + 'index')
 def index():
+    # check query
+    args = flask.request.args
+    query = getitem(args, 'searchbox', '')
     if query == '':
         resultslist = '<div class="alert alert-info" role="alert">Please Enter a search Query</div>'
         results_truncated = False
     else:
-        # handle user args
-        args = flask.request.args
-        query = getitem(args, 'searchbox', '')
         excludebox = getitem(args, 'excludebox', '')
         includebox = getitem(args, 'includebox', '')
         cs = getitem(args, 'caseSensitive', '')

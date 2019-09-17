@@ -2,15 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>mlocate web search</title>
+		<title>{{pagetitle}}</title>
 		<link rel="stylesheet" href="css/custom.css">
 		<link rel="stylesheet" href="css/bootstrap-3.3.7.min.css">
-		<link rel="stylesheet" href="css/bootstrap-theme-3.3.7.min.css">
     <script src="js/jquery-3.4.1.min.js"></script>
 	</head>
 	<body>
 		<div class="container">
-			<h1>Simple mlocate search <small>searching {{hostname|safe}}</small></h1>
+			<h1>{{PAGE_HEADING}} <small>searching {{hostname|safe}}</small></h1>
 			<form class="form-inline" method="get">
 				<div class="form-group">
 					{% for database in databaselist.keys() %}

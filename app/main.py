@@ -42,28 +42,29 @@ def getitem(obj, item, default):
 
 @app.route(APP_ROUTE)
 def main():
-  return flask.redirect(APP_ROUTE + 'index')
+    return flask.redirect(APP_ROUTE + 'index')
 
 @app.route(APP_ROUTE + 'index')
 def index():
-    # handle user args
-    args = flask.request.args
-    query = getitem(args, 'searchbox', '')
-    excludebox = getitem(args, 'excludebox', '')
-    includebox = getitem(args, 'includebox', '')
-    cs = getitem(args, 'caseSensitive', '')
-    bn = getitem(args, 'basename', '')
-    dbsearch = ''
-    for database in databaselist.keys():
-        if getitem(args, database, '') == 'on':
-            databaselist[database]['checked'] = 'checked'
-            dbsearch = dbsearch + ' -d ' + quote('/app/databases/' + database)
-        else:
-            databaselist[database]['checked'] = 'unchecked'
     if query == '':
         resultslist = '<div class="alert alert-info" role="alert">Please Enter a search Query</div>'
         results_truncated = False
     else:
+        # handle user args
+        args = flask.request.args
+        query = getitem(args, 'searchbox', '')
+        excludebox = getitem(args, 'excludebox', '')
+        includebox = getitem(args, 'includebox', '')
+        cs = getitem(args, 'caseSensitive', '')
+        bn = getitem(args, 'basename', '')
+        dbsearch = ''
+        for database in databaselist.keys():
+            if getitem(args, database, '') == 'on':
+                databaselist[database]['checked'] = 'checked'
+                dbsearch = dbsearch + ' -d ' + quote('/app/databases/' + database)
+            else:
+                databaselist[database]['checked'] = 'unchecked'
+
         command = 'mlocate ' + dbsearch
         if(bn == 'on'):
             command = command + ' --basename '

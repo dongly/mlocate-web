@@ -11,6 +11,8 @@ import glob, os, hashlib
 
 MAX_RESULT_BYTES = os.getenv('MAX_RESULT_BYTES', 1000000)  # set to -1 to disable limit
 MAX_DATABASES = os.getenv('MAX_DATABASES', 5)
+DEFAULT_EXCLUDE = os.getenv('DEFAULT_EXCLUDE', '')
+DEFAULT_INCLUDE = os.getenv('DEFAULT_INCLUDE', '')
 PAGE_TITLE = os.getenv('PAGE_TITLE', 'mlocate web search')
 PAGE_HEADING = os.getenv('PAGE_HEADING', 'Simple mlocate search')
 HOSTNAME = os.getenv('HOSTNAME', gethostname() )
@@ -47,10 +49,10 @@ def index():
     # handle user args
     args = flask.request.args
     query = getitem(args, 'searchbox', '')
-    if getitem(args, 'caseSensitive', '') == 'on':
-        cs = 'checked'
-    else:
-        cs = 'unchecked'
+    excludebox = getitem(args, 'excludebox', '')
+    includebox = getitem(args, 'includebox', '')
+    cs = getitem(args, 'caseSensitive', '')
+    bn = getitem(args, 'basename', '')
     dbsearch = ''
     for database in databaselist.keys():
         if getitem(args, database, '') == 'on':
@@ -62,11 +64,22 @@ def index():
         resultslist = '<div class="alert alert-info" role="alert">Please Enter a search Query</div>'
         results_truncated = False
     else:
-        if cs != 'checked':
-            cs = ' -i '
+        command = 'mlocate ' + dbsearch
+        if(bn == 'on'):
+            command = command + ' --basename '
+        if(cs != 'on'):
+            cf = ' -i '
         else:
-            cs = ''
-        command = 'mlocate ' + dbsearch + cs + quote(query)
+            cf = ' '
+        command = command + cf + quote(query)
+        if(excludebox):
+            command = command + ' | grep -v ' + cf + quote(excludebox)
+        if(includebox):
+            command = command + ' | grep ' + cf + quote(includebox)
+        if(DEFAULT_INCLUDE):
+            command = command + ' | grep ' + quote(DEFAULT_INCLUDE)
+        if(DEFAULT_EXCLUDE):
+            command = command + ' | grep -v ' + quote(DEFAULT_EXCLUDE)
         command = command.encode('utf-8')
         with Popen(command, shell=True, stdout=PIPE) as proc:
             outs = proc.stdout.read(MAX_RESULT_BYTES)
@@ -85,6 +98,9 @@ def index():
         'index.html',
         searchbox=query,
         cs=cs,
+        bn=bn,
+        includebox=includebox,
+        excludebox=excludebox,
         databaselist=databaselist,
         results_truncated=results_truncated,
         resultslist=resultslist,

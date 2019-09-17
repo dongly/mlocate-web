@@ -19,7 +19,12 @@ A very simple Python web application that offers a web interface for searching a
 
 * MAX_RESULT_BYTES - [1000000] Maximum size of search results measured in bytes
 * MAX_DATABASES - [5] Maximum allowed databases to be displayed
-* APP_ROUTE - Directory app is hosted.
+* DEFAULT_EXCLUDE - Filter with grep to exclude this string
+* DEFAULT_INCLUDE - Filter with grep to include this string
+* PAGE_TITLE - [mlocate web search] Override title shown in browser tab
+* PAGE_HEADING - [Simple mlocate search] Override main Heading
+* HOSTNAME - [Auto] Cosmetic hostname shown on search page
+* APP_ROUTE - [/] Directory app is hosted.
 
 
 ## Screenshot

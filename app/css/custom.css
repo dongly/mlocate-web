@@ -1,0 +1,14 @@
+.allowCopy {
+        width: 100% !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+        overflow: hidden !important;
+        resize: none !important;
+}
+
+.file-label {
+        font-size: 20px;
+        padding-top: 10px;
+        color: #da5f20;
+}

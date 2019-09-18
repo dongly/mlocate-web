@@ -51,8 +51,8 @@ def index():
     query = getitem(args, 'searchbox', '')
     excludebox = getitem(args, 'excludebox', '')
     includebox = getitem(args, 'includebox', '')
-    cs = getitem(args, 'caseSensitive', '')
-    bn = getitem(args, 'basename', '')
+    caseSensitive = getitem(args, 'caseSensitive', '')
+    basename = getitem(args, 'basename', '')
     if query == '':
         resultslist = '<div class="alert alert-info" role="alert">Please Enter a search Query</div>'
         results_truncated = False
@@ -60,23 +60,20 @@ def index():
         dbsearch = ''
         for database in databaselist.keys():
             if getitem(args, database, '') == 'on':
-                databaselist[database]['checked'] = 'checked'
                 dbsearch = dbsearch + ' -d ' + quote('/app/databases/' + database)
-            else:
-                databaselist[database]['checked'] = 'unchecked'
 
         command = 'mlocate ' + dbsearch
-        if(bn == 'on'):
+        if(basename == 'on'):
             command = command + ' --basename '
-        if(cs != 'on'):
-            cf = ' -i '
+        if(caseSensitive != 'on'):
+            caseSensitive = ' -i '
         else:
-            cf = ' '
-        command = command + cf + quote(query)
+            caseSensitive = ' '
+        command = command + caseSensitive + quote(query)
         if(excludebox):
-            command = command + ' | grep -v ' + cf + quote(excludebox)
+            command = command + ' | grep -v ' + caseSensitive + quote(excludebox)
         if(includebox):
-            command = command + ' | grep ' + cf + quote(includebox)
+            command = command + ' | grep ' + caseSensitive + quote(includebox)
         if(DEFAULT_INCLUDE):
             command = command + ' | grep ' + quote(DEFAULT_INCLUDE)
         if(DEFAULT_EXCLUDE):
@@ -97,11 +94,6 @@ def index():
 
     html = flask.render_template(
         'index.html',
-        searchbox=query,
-        cs=cs,
-        bn=bn,
-        includebox=includebox,
-        excludebox=excludebox,
         databaselist=databaselist,
         results_truncated=results_truncated,
         resultslist=resultslist,

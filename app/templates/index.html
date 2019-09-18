@@ -15,7 +15,8 @@
 					{% for database in databaselist.keys() %}
 					<div class="checkbox">
 							<label for="{{database}}">
-								<input type="checkbox" name="{{database}}" id="{{database}}" {{databaselist[database]['checked']}}> {{databaselist[database]['label']}}
+								<input type="hidden" name="{{database}}_unchecked" id="{{database}}_unchecked" value="0" disabled/>
+								<input type="checkbox" name="{{database}}" id="{{database}}" onclick="rmUncheck(this)" checked> {{databaselist[database]['label']}}
 							</label>
 					</div>
 					{% endfor %}
@@ -23,27 +24,29 @@
 				<br>
 				<div class="form-group">
 					<label class="requiredField" for="searchbox">Query: </label>
-					<input type="text" class="form-control" id="searchbox" name="searchbox" value="{{searchbox}}" placeholder="text">
+					<input type="text" class="form-control" id="searchbox" name="searchbox" placeholder="text">
 				</div>
 				<div class="checkbox">
-					<label>
-						<input type="checkbox" name="caseSensitive" id="caseSensitive" {% if cs == 'on' %}checked{% endif %}> Case Sensitive
+					<label for="caseSensitive">
+						<input type="hidden" name="caseSensitive_unchecked" id="caseSensitive_unchecked" value="1" />
+						<input type="checkbox" name="caseSensitive" id="caseSensitive" onclick="rmUncheck(this)"> Case Sensitive
 					</label>
 				</div>
         <div class="checkbox" style="padding-right:10px">
-        	<label>
-                <input type="checkbox" name="basename" id="basename" {% if bn == 'on' %}checked{% endif %}> Match only the base name
+        	<label for="basename">
+						<input type="hidden" name="basename_unchecked" id="basename_unchecked" value="1" />
+						<input type="checkbox" name="basename" id="basename" onclick="rmUncheck(this)"> Match only the base name
         	</label>
 				</div>
 		  	<br>
 		  	<br>
 		  	<div class="form-group">
 		          <label for="filterbox">Exclude: </label>
-		          <input type="text" class="form-control" id="excludebox" name="excludebox" placeholder="Exclude Text" value="{{excludebox}}">
+		          <input type="text" class="form-control" id="excludebox" name="excludebox" placeholder="Exclude Text">
 		  		</div>
 		  	<div class="form-group">
 		          <label for="filterbox">Include: </label>
-		          <input type="text" class="form-control" id="includebox" name="includebox" placeholder="Include Text" value="{{includebox}}">
+		          <input type="text" class="form-control" id="includebox" name="includebox" placeholder="Include Text">
 		  	</div>
 				<button type="submit" class="btn btn-default">Go</button>
 			</form>
@@ -61,6 +64,44 @@ $(function() {
      $(this).select();
      document.execCommand('copy');
    });
+});
+
+function rmUncheck(element){
+	element.previousElementSibling.value=1-element.previousElementSibling.value
+  if(element.previousElementSibling.value==0){
+  	element.previousElementSibling.disabled = true;
+  } else {
+  	element.previousElementSibling.disabled = false;
+  }
+}
+
+$(document).ready ( function(){
+	var url_string = window.location.href;
+	var url = new URL(url_string);
+	var params = new URLSearchParams(url.search);
+
+	for (const [key, value] of params) {
+
+		console.log(key + " - " + value)
+		var element = document.getElementById(key);
+
+		if(key.includes("_unchecked")){
+
+			element.value = "1";
+			element.disabled = false;
+			document.getElementById(key.replace("_unchecked","")).checked = false;
+
+		} else if(element.getAttribute("type") == "checkbox"){
+
+			document.getElementById(key+"_unchecked").value = "0";
+			document.getElementById(key+"_unchecked").disabled = true;
+			element.checked = true;
+
+		} else if(element.getAttribute("type") == "text"){
+
+			document.getElementById(key).value = decodeURIComponent(value).replace(/\+/g, "%20");
+		}
+	}
 });
 </script>
 
